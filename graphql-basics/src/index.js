@@ -3,24 +3,46 @@ import { GraphQLServer } from 'graphql-yoga'
 // Demo user data
 const users = [{
   id: '1',
-  name: 'User Name',
-  email: 'a@gmail.com',
-  age: 32
+  name: 'Andrew',
+  email: 'andrew@example.com',
+  age: 27
 }, {
   id: '2',
-  name: 'User Name 1',
-  email: 'a1@gmail.com'
+  name: 'Sarah',
+  email: 'sarah@example.com'
 }, {
   id: '3',
-  name: 'User Neme 2',
-  email: 'a3@gmail.com'
+  name: 'Mike',
+  email: 'mike@example.com'
+}]
+
+const posts = [{
+  id: '10',
+  title: 'GraphQL 101',
+  body: 'This is how to use GraphQL...',
+  published: true,
+  author: '1'
+}, {
+  id: '11',
+  title: 'GraphQL 201',
+  body: 'This is an advanced GraphQL post...',
+  published: false,
+  author: '1'
+}, {
+  id: '12',
+  title: 'Programming Music',
+  body: '',
+  published: false,
+  author: '2'
 }]
 
 // Type definitions (schema)
 const typeDefs = `
   type Query {
     users(query: String): [User!]!
+    posts(query: String): [Post!]!
     me: User!
+    post: Post!
   }
 
   type User {
@@ -28,6 +50,14 @@ const typeDefs = `
     name: String!
     email: String!
     age: Int
+  }
+
+  type Post {
+    id: ID!
+    title: String!
+    body: String!
+    published: Boolean!
+    author: User!
   }
 `
 
@@ -43,12 +73,38 @@ const resolvers = {
         return u.name.toLowerCase().includes(args.query.toLowerCase())
       })
     },
+    posts(parent, args, ctx, info) {
+      if (!args.query) {
+          return posts
+      }
+
+      return posts.filter((post) => {
+          const isTitleMatch = post.title.toLowerCase().includes(args.query.toLowerCase())
+          const isBodyMatch = post.body.toLowerCase().includes(args.query.toLowerCase())
+          return isTitleMatch || isBodyMatch
+      })
+    },
     me() {
       return {
         id: '123998',
         name: 'Albert',
         email: 'albert@example.com'
       }
+    },
+    post() {
+      return {
+          id: '092',
+          title: 'GraphQL 101',
+          body: '',
+          published: false
+      }
+    }
+  },
+  Post: {
+    author(parent, args, ctx, info) {
+      return users.find(u => {
+        return u.id === parent.author
+      })
     }
   }
 }
