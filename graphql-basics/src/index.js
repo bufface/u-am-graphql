@@ -36,11 +36,26 @@ const posts = [{
   author: '2'
 }]
 
+const comments = [{
+  id: '100',
+  text: 'Some random comment'
+}, {
+  id: '101',
+  text: 'Some random comment 1'
+}, {
+  id: '102',
+  text: 'Some random comment 2'
+}, {
+  id: '103',
+  text: 'Some random comment 3'
+}]
+
 // Type definitions (schema)
 const typeDefs = `
   type Query {
     users(query: String): [User!]!
     posts(query: String): [Post!]!
+    comments: [Comment!]!
     me: User!
     post: Post!
   }
@@ -59,6 +74,11 @@ const typeDefs = `
     body: String!
     published: Boolean!
     author: User!
+  }
+
+  type Comment {
+    id: ID!
+    text: String!
   }
 `
 
@@ -84,6 +104,9 @@ const resolvers = {
           const isBodyMatch = post.body.toLowerCase().includes(args.query.toLowerCase())
           return isTitleMatch || isBodyMatch
       })
+    },
+    comments() {
+      return comments
     },
     me() {
       return {
