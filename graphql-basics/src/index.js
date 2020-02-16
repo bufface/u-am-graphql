@@ -39,19 +39,23 @@ const posts = [{
 const comments = [{
   id: '100',
   text: 'Some random comment',
-  author: '1'
+  author: '1',
+  post: '12'
 }, {
   id: '101',
   text: 'Some random comment 1',
-  author: '1'
+  author: '1',
+  post: '12'
 }, {
   id: '102',
   text: 'Some random comment 2',
-  author: '1'
+  author: '1',
+  post: '10'
 }, {
   id: '103',
   text: 'Some random comment 3',
-  author: '1'
+  author: '1',
+  post: '11'
 }]
 
 // Type definitions (schema)
@@ -79,12 +83,14 @@ const typeDefs = `
     body: String!
     published: Boolean!
     author: User!
+    comments: [Comment!]!
   }
 
   type Comment {
     id: ID!
     text: String!
     author: User!
+    post: Post!
   }
 `
 
@@ -135,6 +141,11 @@ const resolvers = {
       return users.find(u => {
         return u.id === parent.author
       })
+    },
+    comments(parent, args, ctx, info) {
+      return comments.filter(c => {
+        return c.post === parent.id
+      })
     }
   },
   User: {
@@ -153,6 +164,11 @@ const resolvers = {
     author(parent, args, ctx, info) {
       return users.find(u => {
         return u.id === parent.author
+      })
+    },
+    post(parent, args, ctx, info) {
+      return posts.find(p => {
+        return p.id === parent.post
       })
     }
   }
