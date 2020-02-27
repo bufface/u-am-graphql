@@ -72,6 +72,8 @@ const typeDefs = `
   type Mutation {
     createUser(data: CreateUserInput): User!
     deleteUser(id: ID!): User!
+    deletePost(id: ID!): Post!
+    deleteComment(id: ID!): Comment!
     createPost(data: CreatePostInput): Post!
     createComment(data: CreateCommentInput): Comment!
   }
@@ -180,6 +182,19 @@ const resolvers = {
 
       return user
     },
+    deletePost(parent, args, ctx, info) {
+      const postIndex = posts.findIndex(p => p.id === args.id)
+
+      if (postIndex === -1) {
+        throw new Error('Post not found.')
+      }
+
+      const deletedPosts = posts.splice(postIndex, 1)
+
+      comments = comments.filter(c => c.post !== args.id)
+
+      return deletedPosts[0]
+    },
     deleteUser(parent, args, ctx, info) {
       const userIndex = users.findIndex(u => u.id === args.id)
 
@@ -199,9 +214,20 @@ const resolvers = {
         return !match
       })
 
-      comments = comments.filter(c => comments.author !== args.id)
+      comments = comments.filter(c => c.author !== args.id)
 
-      return deleteUser[0]
+      return deletedUsers[0]
+    },
+    deleteComment(parent, args, ctx, info) {
+        const commentIndex = comments.findIndex((comment) => comment.id === args.id)
+
+        if (commentIndex === -1) {
+            throw new Error('Comment not found')
+        }
+
+        const deletedComments = comments.splice(commentIndex, 1)
+
+        return deletedComments[0]
     },
     createPost(parent, args, ctx, info) {
       const userExist = users.some(u => u.id === args.data.author)
