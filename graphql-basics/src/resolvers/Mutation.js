@@ -53,6 +53,34 @@ const Mutation = {
 
     return deletedUsers[0]
   },
+  updateUser(parent, args, ctx, info) {
+    const { id, data } = args
+    const user = ctx.db.users.find(u => u.id === id)
+
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    if (typeof data.email === 'string') {
+      const emailTaken = ctx.db.users.some(u => u.email === data.email)
+
+      if (emailTaken) {
+        throw new Error('Email taken')
+      }
+
+      user.email = data.email
+    }
+
+    if (typeof data.name === 'string') {
+      user.name = data.name
+    }
+
+    if (typeof data.age !== 'undefined') {
+      user.age = data.age
+    }
+
+    return user
+  },
   deleteComment(parent, args, ctx, info) {
       const commentIndex = ctx.db.comments.findIndex((comment) => comment.id === args.id)
 
