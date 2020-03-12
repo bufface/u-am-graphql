@@ -108,6 +108,28 @@ const Mutation = {
 
     return post
   },
+  updatePost(parent, args, ctx, info) {
+    const { id, data } = args
+    const post = ctx.db.posts.find(p => p.id === id)
+
+    if (!post) {
+      throw new Error('Post not found')
+    }
+
+    if (typeof data.title === 'string') {
+      post.title = data.title
+    }
+
+    if (typeof data.body === 'string') {
+      post.body = data.body
+    }
+
+    if (typeof data.published === 'boolean') {
+      post.published = data.published
+    }
+
+    return post
+  },
   createComment(parent, args, ctx, info) {
     const userExist = ctx.db.users.some(u => u.id === args.data.author)
     const postExist = ctx.db.posts.some(p => p.id === args.data.post && p.published)
@@ -124,7 +146,21 @@ const Mutation = {
     ctx.db.comments.push(comment)
 
     return comment
-  }
+  },
+  updateComment(parent, args, ctx, info) {
+    const { id, data } = args
+    const comment = ctx.db.comments.find(p => p.id === id)
+
+    if (!comment) {
+      throw new Error('Comment not found')
+    }
+
+    if (typeof data.text === 'string') {
+      comment.text = data.text
+    }
+
+    return comment
+  },
 }
 
 export { Mutation as default }
